@@ -9,6 +9,28 @@ import ollama  # Import the Ollama library
 # Set page configuration
 st.set_page_config(layout="wide")
 
+def get_available_models() -> List[str]:
+    """
+    Get a list of available models from Ollama.
+    
+    Returns:
+        List[str]: A list of available model names.
+    """
+    try:
+        # Fetch the list of models from Ollama
+        models_response = ollama.list()
+        
+        # Extract model names from the response
+        if "models" in models_response and isinstance(models_response["models"], list):
+            model_names = [model.model for model in models_response["models"] if hasattr(model, 'model')]
+            return model_names
+        else:
+            st.warning("No models found in the Ollama response.")
+            return []
+    except Exception as e:
+        st.error(f"An error occurred while fetching available models: {e}")
+        return []
+
 def process_pdf(pdf_path: str, show_text: bool, show_images: bool) -> Tuple[fitz.Document, Dict[int, List[str]]]:
     """
     Process the PDF to extract text and draw borders around text blocks and images.
@@ -67,25 +89,26 @@ def save_and_encode_pdf(doc: fitz.Document) -> Tuple[bytes, str]:
         modified_pdf_bytes = f.read()
     return modified_pdf_bytes, base64.b64encode(modified_pdf_bytes).decode("utf-8")
 
-def format_text_with_llama(text: str) -> str:
+def format_text_with_llama(text: str, model: str) -> str:
     """
-    Use Ollama's Llama 3.1 model to format the text into Markdown.
+    Use the selected Ollama model to format the text into Markdown.
     
     Args:
         text (str): The text to format.
+        model (str): The model to use for formatting.
     
     Returns:
-    str: The formatted Markdown text.
+        str: The formatted Markdown text.
     """
     try:
-        # Send the text to the Llama 3.1 model for formatting
+        # Send the text to the selected model for formatting
         response = ollama.generate(
-            model="llama3.1:8b",  # Use the Llama 3.1 model
-            prompt=f"{text}\n\n"
+            model=model,
+            prompt=f"Format the following text into Markdown without removing any data:\n\n{text}"
         )
         return response["response"]
     except Exception as e:
-        st.error(f"An error occurred while formatting the text with Llama 3.1: {e}")
+        st.error(f"An error occurred while formatting the text with {model}: {e}")
         return text  # Return the original text if formatting fails
 
 def display_pdf_and_results(modified_pdf_bytes: bytes, modified_pdf_base64: str, page_texts: Dict[int, List[str]]) -> None:
@@ -100,8 +123,7 @@ def display_pdf_and_results(modified_pdf_bytes: bytes, modified_pdf_base64: str,
     col1, col2 = st.columns(2)
     
     with col1:
-        st.subheader("Selected PDF")
-        st.caption("The selected PDF will be displayed here.")
+        st.subheader("PDF Viewer")
         # Display the modified PDF in an iframe
         pdf_display = f"""
         <iframe src="data:application/pdf;base64,{modified_pdf_base64}" 
@@ -122,7 +144,6 @@ def display_pdf_and_results(modified_pdf_bytes: bytes, modified_pdf_base64: str,
     
     with col2:
         st.subheader("Extracted Result")
-        st.caption("The extracted text from the PDF will be displayed here. Click 'Process Through AI' to format the text.")
         # Display the extracted text for each page in expanders
         for page_num, texts in page_texts.items():
             with st.expander(f"Page {page_num + 1}"):
@@ -133,16 +154,25 @@ def display_pdf_and_results(modified_pdf_bytes: bytes, modified_pdf_base64: str,
                     st.write("\n\n".join(texts))  # Display all text blocks for the page, separated by double newlines
                 
                 with tab2:
+                    # Dropdown to select the model
+                    available_models = get_available_models()
+                    selected_model = st.selectbox(
+                        "Select a model for AI processing",
+                        available_models,
+                        key=f"model_{page_num + 1}",
+                    )
+                    
                     prompt = st.text_area(
                         "Enter prompt for AI processing",
                         value="Format the following text into Markdown without removing any data",
                         key=f"prompt_{page_num + 1}",
                     )
+                    
                     # Add a button to trigger AI processing
                     if st.button(f"Process Through AI (Page {page_num + 1})"):
                         with st.spinner(f"Processing Page {page_num + 1} through AI..."):
-                            # Format the text using Llama 3.1
-                            formatted_text = format_text_with_llama(f"{prompt}\n" + "\n\n".join(texts))
+                            # Format the text using the selected model
+                            formatted_text = format_text_with_llama(f"{prompt}\n" + "\n\n".join(texts), selected_model)
                             # Add a scrollable container for the AI output
                             st.markdown(
                                 f"""
@@ -177,7 +207,7 @@ def main() -> None:
             show_images = st.checkbox("Show Image Borders", value=True)
             show_text = st.checkbox("Show Text Borders", value=True)
 
-        # Check if a file is uploaded
+    # Check if a file is uploaded
     if uploaded_file is None:
         st.warning("Please upload a PDF file using the sidebar.")
     else:
