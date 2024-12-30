@@ -96,6 +96,22 @@ streamlit run app.py
 
 Contributions are welcome! Please feel free to submit pull requests.
 
+## Docker Compose
+
+To run the application using Docker Compose:
+
+1.  Ensure you have Docker and Docker Compose installed.
+2.  Navigate to the project directory:
+
+    ```bash
+    cd <project_directory>
+    ```
+3.  Run the following command:
+
+    ```bash
+    docker-compose up --build
+    ```
+
 ## License
 
 This project is licensed under the MIT License.
