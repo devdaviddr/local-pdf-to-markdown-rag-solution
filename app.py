@@ -81,7 +81,7 @@ def format_text_with_llama(text: str) -> str:
         # Send the text to the Llama 3.1 model for formatting
         response = ollama.generate(
             model="llama3.1:8b",  # Use the Llama 3.1 model
-            prompt=f"Format the following text into Markdown without removing any data:\n\n{text}"
+            prompt=f"{text}\n\n"
         )
         return response["response"]
     except Exception as e:
@@ -100,7 +100,8 @@ def display_pdf_and_results(modified_pdf_bytes: bytes, modified_pdf_base64: str,
     col1, col2 = st.columns(2)
     
     with col1:
-        st.subheader("PDF Viewer")
+        st.subheader("Selected PDF")
+        st.caption("The selected PDF will be displayed here.")
         # Display the modified PDF in an iframe
         pdf_display = f"""
         <iframe src="data:application/pdf;base64,{modified_pdf_base64}" 
@@ -121,6 +122,7 @@ def display_pdf_and_results(modified_pdf_bytes: bytes, modified_pdf_base64: str,
     
     with col2:
         st.subheader("Extracted Result")
+        st.caption("The extracted text from the PDF will be displayed here. Click 'Process Through AI' to format the text.")
         # Display the extracted text for each page in expanders
         for page_num, texts in page_texts.items():
             with st.expander(f"Page {page_num + 1}"):
@@ -131,11 +133,16 @@ def display_pdf_and_results(modified_pdf_bytes: bytes, modified_pdf_base64: str,
                     st.write("\n\n".join(texts))  # Display all text blocks for the page, separated by double newlines
                 
                 with tab2:
+                    prompt = st.text_area(
+                        "Enter prompt for AI processing",
+                        value="Format the following text into Markdown without removing any data",
+                        key=f"prompt_{page_num + 1}",
+                    )
                     # Add a button to trigger AI processing
                     if st.button(f"Process Through AI (Page {page_num + 1})"):
                         with st.spinner(f"Processing Page {page_num + 1} through AI..."):
                             # Format the text using Llama 3.1
-                            formatted_text = format_text_with_llama("\n\n".join(texts))
+                            formatted_text = format_text_with_llama(f"{prompt}\n" + "\n\n".join(texts))
                             # Add a scrollable container for the AI output
                             st.markdown(
                                 f"""
@@ -158,7 +165,8 @@ def main() -> None:
     """
     # Sidebar
     with st.sidebar:
-        st.title("PDF Viewer")
+        st.title("Select PDF")
+        st.caption("Upload a PDF file to view and extract text.")
         
         # PDF file uploader
         uploaded_file = st.file_uploader("Upload a PDF file", type="pdf")
