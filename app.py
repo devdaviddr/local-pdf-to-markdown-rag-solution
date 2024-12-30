@@ -9,6 +9,9 @@ import ollama  # Import the Ollama library
 # Set page configuration
 st.set_page_config(layout="wide")
 
+# Set the Ollama host globally
+client = ollama.Client()
+
 def get_available_models() -> List[str]:
     """
     Get a list of available models from Ollama.
@@ -18,11 +21,12 @@ def get_available_models() -> List[str]:
     """
     try:
         # Fetch the list of models from Ollama
-        models_response = ollama.list()
+        models_response = client.list()
+        print(f"Ollama models response: {models_response}")
         
         # Extract model names from the response
         if "models" in models_response and isinstance(models_response["models"], list):
-            model_names = [model.model for model in models_response["models"] if hasattr(model, 'model')]
+            model_names = [model["model"] for model in models_response["models"]]
             return model_names
         else:
             st.warning("No models found in the Ollama response.")
@@ -102,7 +106,7 @@ def format_text_with_llama(text: str, model: str) -> str:
     """
     try:
         # Send the text to the selected model for formatting
-        response = ollama.generate(
+        response = client.generate(
             model=model,
             prompt=f"Format the following text into Markdown without removing any data:\n\n{text}"
         )

@@ -22,6 +22,8 @@ This project was created to address the challenges of preparing PDF data for ind
 This project aims to address the following challenges:
 
 - PDFs are not always well formatted for indexing.
+- Paragraphs are sometimes separated by a line break, which is not recognized as a new paragraph.
+- Sometimes content overflows one page to another
 - Tables are sometimes formatted differently in one document compared to another.
 - Images are sometimes created with word art shapes, which are difficult to extract using Python.
 - Data in one PDF can be repeated in another PDF with slight differences, which can poison the results.
@@ -39,15 +41,16 @@ This project aims to address the following challenges:
 - [x] PDF Upload
 - [x] Ollama Support
 - [x] Output to Markdown
-- [x] Basic OCR
-- [x] Basic Tables
+- [x] Basic OCR of test
+- [x] Basic OCR of Tables
 
 ### Not Working Features
 - [ ] Image Extraction
 - [ ] Image OCR
 - [ ] Bullet and Numbered Lists
-- [ ] Indentation
+- [ ] Paragraph Indentation
 - [ ] Page Overflow of Content
+_ [ ] Advanced Tables
 
 ## Project Structure
 

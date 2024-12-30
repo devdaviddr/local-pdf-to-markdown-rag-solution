@@ -1,0 +1,14 @@
+version: '3.8'
+services:
+  streamlit_app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8501:8501"  # Streamlit port
+    extra_hosts:
+      - "host.docker.internal:host-gateway"  # Allows access to localhost from the container
+    environment:
+      - OLLAMA_HOST=http://host.docker.internal:11434  # Point to Ollama service on localhost
+
+# No need for volumes since we're using localhost models
