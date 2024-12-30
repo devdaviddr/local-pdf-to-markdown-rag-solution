@@ -52,6 +52,10 @@ This project aims to address the following challenges:
 - [ ] Page Overflow of Content
 _ [ ] Advanced Tables
 
+## How the Python App Works
+
+The `app.py` file is a Streamlit application that processes PDF documents. It uses the PyMuPDF library to extract text and images from the PDF. It then uses the Ollama library to format the extracted text into Markdown. The app displays the PDF and the extracted text side-by-side, and allows the user to download the modified PDF and the formatted markdown.
+
 ## Project Structure
 
 The project is structured as follows:
