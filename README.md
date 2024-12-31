@@ -4,6 +4,7 @@ This Streamlit application converts PDF documents into Markdown format using AI-
 
 This project was created to address the challenges of preparing PDF data for indexing, which can be a time-consuming and complex process.
 
+
 ## Features
 
 - **PDF Upload:** Allows users to upload PDF documents.
@@ -11,23 +12,10 @@ This project was created to address the challenges of preparing PDF data for ind
 - **Data Extraction:** Extracts relevant data from the analyzed pages.
 - **Markdown Output:** Formats the extracted data into Markdown for easy indexing and readability.
 
-## Input and Output
 
-**Input:** A PDF file.
-
-**Output:** A Markdown file containing the extracted and formatted content from the PDF.
-
-## Challenges
-
-This project aims to address the following challenges:
-
-- PDFs are not always well formatted for indexing.
-- Paragraphs are sometimes separated by a line break, which is not recognized as a new paragraph.
-- Sometimes content overflows one page to another
-- Tables are sometimes formatted differently in one document compared to another.
-- Images are sometimes created with word art shapes, which are difficult to extract using Python.
-- Data in one PDF can be repeated in another PDF with slight differences, which can poison the results.
-- Relying on a script to index one PDF according to rulesets works fine, but indexing many PDFs with different formats presents problems of consistency.
+| Diagram                  | Challenges     |
+|--------------------------|----------------|
+| ![Diagram](diagram.png)  | <ul><li>This project aims to address the following challenges:</li><li>PDFs are not always well formatted for indexing.</li><li>Paragraphs are sometimes separated by a line break, which is not recognized as a new paragraph.</li><li>Sometimes content overflows one page to another.</li><li>Tables are sometimes formatted differently in one document compared to another.</li><li>Images are sometimes created with word art shapes, which are difficult to extract using Python.</li><li>Data in one PDF can be repeated in another PDF with slight differences, which can poison the results.</li><li>Relying on a script to index one PDF according to rulesets works fine, but indexing many PDFs with different formats presents problems of consistency.</li></ul> |
 
 ## How to Use
 
